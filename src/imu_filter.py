@@ -2,37 +2,23 @@ import proccom
 import dsp
 
 
-class MultiChannelFilter:
-
-    def __init__(self, channels: int, b: list, a: list = None, k: float = 1):
-        self.channels = channels
-        self.filters = []
-        for i in range(self.channels):
-            self.filters.append(dsp.core.Filter(b, a=a, k=k))
-
-    def filter_values(self, values):
-        """
-        Filters values
-        :param values: values to filter
-        :return: filtered values
-        """
-        filtered_values = [0] * self.channels
-        if len(values) == self.channels:
-            for i in range(self.channels):
-                filtered_values[i] = self.filters[i].filter_value(values[i])
-        else:
-            filtered_values = None
-
-        filtered_values = [self.filters[i].filter_value(values[i]) for i in range(self.channels)]
-        return filtered_values
-
-
-class ImuFilter:
+class SensorFeedback:
 
     def __init__(self, host, port):
-        self.subscriber = proccom.Subscriber({'imu': self.imu_callback}, 'imu_filter', host=host, port=port)
+        self.subscriber = proccom.Subscriber({'imu': self.imu_callback, 'steps': self.step_callback}, 'sensor_feedback',
+                                             host=host, port=port)
+        self.publisher = proccom.Publisher('reg_in', 'sensor_feedback_pub', self.format_output)
+        self.acc_filter = dsp.core.MultiChannelFilter(3, [1])
+        self.gyro_filter = dsp.core.MultiChannelFilter(3, [1])
+        self.mag_filter = dsp.core.MultiChannelFilter(3, [1])
+
+    def format_output(self, a, b, c):
+        return {'a': a, 'b': b, 'c': c}
 
     def imu_callback(self, msg):
+        pass
+
+    def step_callback(self, msg):
         pass
 
 
