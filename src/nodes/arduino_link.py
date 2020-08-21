@@ -12,7 +12,7 @@ class ArduinoLink:
         self.register_name_map = register_map['name']  # {'register_name': register_number}
         self.register_number_map = {self.register_name_map[key]: key for key in self.register_name_map.keys()}  # {register_number: 'register_name'}
         self.protocol = sp.RACProtocol(register_map['type'], input_pad=True)
-        self.protocol_executor = sp.ProtocolExecutor(self.protocol, self._input_handler, com_port, baudrate)
+        self.protocol_executor = sp.ProtocolExecutor(self.protocol, self._input_handler, com_port, baudrate, debug=True)
         self.publisher = proccom.Publisher(
             'arduino_output', 'arduino_link_pub', self._format_data, host=tcp_host, port=tcp_port
         )
@@ -21,16 +21,22 @@ class ArduinoLink:
         )
 
     def start(self, delay=5, print_status=True):
-        self.protocol_executor.start()
-        if print_status:
-            print(self, ':: Protocol executor establishing communication...')
-        time.sleep(delay)
-        if print_status:
-            print(self, ':: Connecting Proccom publisher and subscriber...')
-        self.publisher.connect()
-        self.subscriber.connect()
-        if print_status:
-            print(self, ':: DONE')
+        executor_started = self.protocol_executor.start()
+        if executor_started:
+            if print_status:
+                print(self, ':: Protocol executor establishing communication...')
+            time.sleep(delay)
+            if executor_started:
+                if print_status:
+                    print(self, ':: Protocol executor establishing communication...')
+                if print_status:
+                    print(self, ':: Connecting Proccom publisher and subscriber...')
+                self.publisher.connect()
+                self.subscriber.connect()
+                if print_status:
+                    print(self, ':: DONE')
+        else:
+            print(self, ':: Protocol executor encountered an exception and could not start.')
 
     def stop(self):
         print(self, 'in stop')
@@ -44,6 +50,7 @@ class ArduinoLink:
         :param data:
         :return:
         """
+
         self.publisher.publish(data)
 
     def _format_data(self, data):
@@ -56,6 +63,14 @@ class ArduinoLink:
         for register, value in data:
             reg_name = self.register_number_map[register]
             output[reg_name] = value
+        acc_registers = ['acc_x', 'acc_y', 'acc_z']
+        gyro_registers = ['gyro_x', 'gyro_y', 'gyro_z']
+        print('____________')
+        for acc, gyro in zip(acc_registers, gyro_registers):
+            output[acc] = output[acc] / 16384
+            output[gyro] = output[gyro] / 131
+            print(f'{acc}: {round(output[acc], 5)}    {gyro}: {round(output[gyro], 5)}')
+        print('____________')
         return output
 
     def _arduino_cmd_callback(self, msg):
@@ -117,7 +132,7 @@ def main():
             'gyro_z': 12
         }
     }
-    ard_link = ArduinoLink('127.0.0.1', 5000, 'COM3', 250000, register_map)
+    ard_link = ArduinoLink('127.0.0.1', 5000, '/dev/ttyUSB0', 250000, register_map)
     ard_link.start()
 
 
