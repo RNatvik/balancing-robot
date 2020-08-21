@@ -37,13 +37,13 @@ class RACProtocol:
         """
         self.register_map = register_type_map
         self.parser_map = {
-            RACProtocol.BOOL: (1, '?'),
-            RACProtocol.BYTE: (1, 'B'),
-            RACProtocol.INT: (2, 'h'),
-            RACProtocol.FLOAT: (4, 'f'),
-            RACProtocol.LONG: (4, 'l'),
-            RACProtocol.UINT: (2, 'H'),
-            RACProtocol.ULONG: (4, 'L')
+            RACProtocol.BOOL: (1, '=?'),
+            RACProtocol.BYTE: (1, '=B'),
+            RACProtocol.INT: (2, '=h'),
+            RACProtocol.FLOAT: (4, '=f'),
+            RACProtocol.LONG: (4, '=l'),
+            RACProtocol.UINT: (2, '=H'),
+            RACProtocol.ULONG: (4, '=L')
         }
         self.input_pad = input_pad
         self.output_pad = output_pad
