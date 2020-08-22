@@ -8,7 +8,7 @@
     ]
   },
   "gyro": {
-    "scale": 16384,
+    "scale": 131,
     "offset": [
       0,
       0,
@@ -24,6 +24,6 @@
       "num": [1],
       "den": [1]
     },
-    "complementary_alpha": 0.5
+    "complementary_alpha": 0.95
   }
 }
