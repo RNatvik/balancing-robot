@@ -1,23 +1,21 @@
 import serial_package as sp
 import proccom
 import time
+import json
 
 
 class ArduinoLink:
-    """
-    TODO: Make an external file for arduino config (register_map, comport, baudrate, etc..)
-    """
 
     def __init__(self, tcp_host: str, tcp_port: int, com_port: str, baudrate: int, register_map: dict):
-        self.register_name_map = register_map['name']  # {'register_name': register_number}
-        self.register_number_map = {self.register_name_map[key]: key for key in self.register_name_map.keys()}  # {register_number: 'register_name'}
+        self.register_map = register_map
         self.protocol = sp.RACProtocol(register_map['type'], input_pad=True)
         self.protocol_executor = sp.ProtocolExecutor(self.protocol, self._input_handler, com_port, baudrate, debug=True)
         self.publisher = proccom.Publisher(
             'arduino_output', 'arduino_link_pub', self._format_data, host=tcp_host, port=tcp_port
         )
         self.subscriber = proccom.Subscriber(
-            {'arduino_cmd': self._arduino_cmd_callback, 'shutdown_cmd': self._shutdown_msg_handler}, 'arduino_link_sub', host=tcp_host, port=tcp_port
+            {'arduino_cmd': self._arduino_cmd_callback, 'shutdown_cmd': self._shutdown_msg_handler}, 'arduino_link_sub',
+            host=tcp_host, port=tcp_port
         )
 
     def start(self, delay=5, print_status=True):
@@ -61,8 +59,10 @@ class ArduinoLink:
         """
         output = {}
         for register, value in data:
-            reg_name = self.register_number_map[register]
+            reg_name = self.register_map['number_to_name'][register]
             output[reg_name] = value
+
+        # The following code is only used for testing purposes. Remove when finished
         acc_registers = ['acc_x', 'acc_y', 'acc_z']
         gyro_registers = ['gyro_x', 'gyro_y', 'gyro_z']
         print('____________')
@@ -71,6 +71,7 @@ class ArduinoLink:
             output[gyro] = output[gyro] / 131
             print(f'{acc}: {round(output[acc], 5)}    {gyro}: {round(output[gyro], 5)}')
         print('____________')
+        # Test code end
         return output
 
     def _arduino_cmd_callback(self, msg):
@@ -84,7 +85,7 @@ class ArduinoLink:
         registers = data.keys()
         a = []
         for reg_name in registers:
-            reg_num = self.register_name_map[reg_name]
+            reg_num = self.register_map['name_to_number'][reg_name]
             value = data[reg_name]
             a.append((reg_num, value))
         self.protocol_executor.set_data(a)
@@ -99,40 +100,26 @@ class ArduinoLink:
 
 
 def main():
-    register_map = {
-        'type': {
-            0: sp.RACProtocol.INT,  # This register corresponds to drive_delay1
-            1: sp.RACProtocol.INT,  # This register corresponds to drive_delay2
-            2: sp.RACProtocol.BOOL,  # This register corresponds to drive_enable1
-            3: sp.RACProtocol.BOOL,  # This register corresponds to drive_enable2
-            4: sp.RACProtocol.ULONG,  # This register corresponds to step_counter1
-            5: sp.RACProtocol.ULONG,  # This register corresponds to step_counter2
-            6: sp.RACProtocol.UINT,  # This register corresponds to transmit_rate
-            7: sp.RACProtocol.INT,  # This register corresponds to acc_x
-            8: sp.RACProtocol.INT,  # This register corresponds to acc_y
-            9: sp.RACProtocol.INT,  # This register corresponds to acc_z
-            10: sp.RACProtocol.INT,  # This register corresponds to gyro_x
-            11: sp.RACProtocol.INT,  # This register corresponds to gyro_y
-            12: sp.RACProtocol.INT,  # This register corresponds to gyro_z
+    # Open relevant config files
+    with open("../config/server.json", 'r') as server_file:
+        server_config = json.load(server_file)
+    with open("../config/arduino.json", 'r') as arduino_file:
+        arduino_config = json.load(arduino_file)
+    tcp_host = server_config['host']
+    tcp_port = server_config['port']
+    serial_port = arduino_config['com_port']
+    baudrate = arduino_config['baudrate']
+    registers = arduino_config['registers']
+    type_map = arduino_config['type_map']
 
-        },
-        'name': {
-            'drive_delay1': 0,
-            'drive_delay2': 1,
-            'drive_enable1': 2,
-            'drive_enable2': 3,
-            'step_counter1': 4,
-            'step_counter2': 5,
-            'transmit_rate': 6,
-            'acc_x': 7,
-            'acc_y': 8,
-            'acc_z': 9,
-            'gyro_x': 10,
-            'gyro_y': 11,
-            'gyro_z': 12
-        }
+    # Create register mapping from config file
+    register_map = {
+        "type": {register['reg_num']: type_map[register['type']] for register in registers},
+        "number_to_name": {register['reg_num']: register['name'] for register in registers},
+        "name_to_number": {register['name']: register['reg_num'] for register in registers}
     }
-    ard_link = ArduinoLink('127.0.0.1', 5000, '/dev/ttyUSB0', 250000, register_map)
+
+    ard_link = ArduinoLink(tcp_host, tcp_port, serial_port, baudrate, register_map)
     ard_link.start()
 
 
