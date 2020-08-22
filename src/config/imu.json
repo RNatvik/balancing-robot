@@ -1,0 +1,29 @@
+{
+  "accelerometer": {
+    "scale": 16384,
+    "offset": [
+      0,
+      0,
+      0
+    ]
+  },
+  "gyro": {
+    "scale": 16384,
+    "offset": [
+      0,
+      0,
+      0
+    ]
+  },
+  "filter": {
+    "accelerometer_coefficients": {
+      "num": [1],
+      "den": [1]
+    },
+    "gyro_coefficients": {
+      "num": [1],
+      "den": [1]
+    },
+    "complementary_alpha": 0.5
+  }
+}
