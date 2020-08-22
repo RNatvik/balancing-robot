@@ -29,7 +29,7 @@ def feedback_handler(msg):
     gyro = output['gyro']
     with lock:
         new_x.append(round(time.time() - t0, 5))
-        new_y.append(gyro)
+        new_y.append(orientation)
 
 
 def get_data():
@@ -52,7 +52,7 @@ def animate(i):
     ax.clear()
     ax.plot(x, y)
     plt.xticks(rotation=45, ha='right')
-    plt.legend(['ax', 'ay', 'az'])
+    plt.legend(['r', 'p', 'y'])
 
 
 def main():

@@ -74,6 +74,7 @@ class FeedbackInterpreter:
         return acc, gyro
 
     def _calculate_orientation(self, acc, gyro):
+        # TODO: Figure out what units are applied to acc_roll and gyro_roll
         t = time.time()
         dt = t - self.t0
         self.t0 = t
