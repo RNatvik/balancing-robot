@@ -83,17 +83,6 @@ class ArduinoLink:
         for register, value in data:
             reg_name = self.register_map['number_to_name'][register]
             output[reg_name] = value
-
-        # The following code is only used for testing purposes. Remove when finished
-        acc_registers = ['acc_x', 'acc_y', 'acc_z']
-        gyro_registers = ['gyro_x', 'gyro_y', 'gyro_z']
-        print('____________')
-        for acc, gyro in zip(acc_registers, gyro_registers):
-            output[acc] = output[acc] / 16384
-            output[gyro] = output[gyro] / 131
-            print(f'{acc}: {round(output[acc], 5)}    {gyro}: {round(output[gyro], 5)}')
-        print('____________')
-        # Test code end
         return output
 
     def _arduino_cmd_callback(self, msg):
