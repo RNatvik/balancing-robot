@@ -3,7 +3,7 @@ import time
 
 
 def format_msg():
-    return {'transmit_rate': 2000}
+    return {'transmit_rate': 20}
 
 
 def main():

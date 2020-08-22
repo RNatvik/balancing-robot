@@ -95,7 +95,7 @@ class FeedbackInterpreter:
         self.test_pitch += gyro[1]*dt
         self.test_yaw += gyro[2]*dt
 
-        return acc_roll, acc_pitch, self.test_roll, self.test_pitch, self.test_t0
+        return acc_roll, acc_pitch, self.test_roll, self.test_pitch, self.test_yaw
 
     def _handle_shutdown(self, msg):
         data = msg['data']
