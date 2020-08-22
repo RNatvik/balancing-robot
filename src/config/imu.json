@@ -2,27 +2,35 @@
   "accelerometer": {
     "scale": 16384,
     "offset": [
-      0,
-      0,
-      0
+      0.006796426535186084,
+      -0.030393296480918687,
+      -0.09846240816107556
     ]
   },
   "gyro": {
     "scale": 131,
     "offset": [
-      0,
-      0,
-      0
+      -4.159986128090105,
+      -0.007533494043703174,
+      0.7816153965890982
     ]
   },
   "filter": {
     "accelerometer_coefficients": {
-      "num": [1],
-      "den": [1]
+      "num": [
+        1
+      ],
+      "den": [
+        1
+      ]
     },
     "gyro_coefficients": {
-      "num": [1],
-      "den": [1]
+      "num": [
+        1
+      ],
+      "den": [
+        1
+      ]
     },
     "complementary_alpha": 0.95
   }
