@@ -1,3 +1,5 @@
+import json
+
 import proccom
 import threading
 
@@ -24,10 +26,14 @@ class ServerApp:
         self.server.start()  # Blocking call
 
 
-def main(host='127.0.0.1', port=5000, delay=5):
+def main(server_config_path, delay=2):
+    with open(server_config_path, 'r') as server_file:
+        server_config = json.load(server_file)
+    host = server_config['host']
+    port = server_config['port']
     app = ServerApp(host, port)
     app.run(delay)
 
 
 if __name__ == '__main__':
-    main()
+    main('../config/server.json')
