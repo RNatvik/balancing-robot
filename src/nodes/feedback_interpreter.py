@@ -78,11 +78,11 @@ class FeedbackInterpreter:
         t = time.time()
         dt = t - self.t0
         self.t0 = t
-        acc_roll = math.atan2(acc[1], acc[2])
-        acc_pitch = math.atan2(-acc[0], math.sqrt(acc[1]**2 + acc[2]**2))
+        acc_roll = math.atan2(acc[1], acc[2]) * 180 / math.pi
+        acc_pitch = math.atan2(-acc[0], math.sqrt(acc[1]**2 + acc[2]**2)) * 180 / math.pi
         self.roll = self.comp_alpha * (self.roll + gyro[0]*dt) + (1 - self.comp_alpha) * acc_roll
         self.pitch = self.comp_alpha * (self.pitch + gyro[1]*dt) + (1 - self.comp_alpha) * acc_pitch
-        self.yaw = gyro[2]*dt
+        self.yaw += gyro[2]*dt
 
         return self.roll, self.pitch, self.yaw
 

@@ -27,6 +27,7 @@ def feedback_handler(msg):
     orientation = output['orientation']
     acc = output['acc']
     gyro = output['gyro']
+    raw_gyro_angle = [raw['gyro']['roll'], raw['gyro']['pitch'], raw['gyro']['yaw']]
     with lock:
         new_x.append(round(time.time() - t0, 5))
         new_y.append(orientation)
