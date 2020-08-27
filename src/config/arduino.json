@@ -25,46 +25,56 @@
     },
     {
       "reg_num": 4,
-      "type": "ULONG",
-      "name": "step_counter1"
+      "type": "BOOL",
+      "name": "dir_state1"
     },
     {
       "reg_num": 5,
-      "type": "ULONG",
-      "name": "step_counter2"
+      "type": "BOOL",
+      "name": "dir_state2"
     },
     {
       "reg_num": 6,
+      "type": "LONG",
+      "name": "step_counter1"
+    },
+    {
+      "reg_num": 7,
+      "type": "LONG",
+      "name": "step_counter2"
+    },
+    {
+      "reg_num": 8,
       "type": "UINT",
       "name": "transmit_rate"
     },
     {
-      "reg_num": 7,
+      "reg_num": 9,
       "type": "INT",
       "name": "acc_x"
     },
     {
-      "reg_num": 8,
+      "reg_num": 10,
       "type": "INT",
       "name": "acc_y"
     },
     {
-      "reg_num": 9,
+      "reg_num": 11,
       "type": "INT",
       "name": "acc_z"
     },
     {
-      "reg_num": 10,
+      "reg_num": 12,
       "type": "INT",
       "name": "gyro_x"
     },
     {
-      "reg_num": 11,
+      "reg_num": 13,
       "type": "INT",
       "name": "gyro_y"
     },
     {
-      "reg_num": 12,
+      "reg_num": 14,
       "type": "INT",
       "name": "gyro_z"
     }
