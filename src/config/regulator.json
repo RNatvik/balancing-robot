@@ -1,5 +1,13 @@
 {
-  "p": 1,
-  "i": 0,
-  "d": 0
+  "physical": {
+    "wheel_diameter": 0.08,
+    "motor_resolution": 200,
+    "centre_of_mass": 0.2
+  },
+  "params": {
+    "p": 1,
+    "i": 0,
+    "d": 0,
+    "base_time": 0.0005
+  }
 }
