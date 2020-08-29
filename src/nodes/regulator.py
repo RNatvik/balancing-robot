@@ -1,5 +1,6 @@
 import proccom
 import json
+from helpers.pid import PID
 
 
 class Regulator:
@@ -11,6 +12,10 @@ class Regulator:
         self.subscriber = proccom.Subscriber(
             {'feedback': self.handle_feedback, 'reference': self.handle_reference},
             'regulator_sub', host=server_host, port=server_port
+        )
+        self.pid = PID(
+            regulator_param['p'], regulator_param['i'], regulator_param['d'],
+            ilim=regulator_param['ilim'], olim=regulator_param['olim']
         )
         self.base_time = regulator_param['base_time']
         self.physical_param = physical_param
