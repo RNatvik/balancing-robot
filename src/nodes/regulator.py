@@ -1,5 +1,6 @@
 import proccom
 import json
+import math
 from helpers.pid import PID
 
 
@@ -10,7 +11,7 @@ class Regulator:
             'arduino_cmd', 'regulator_pub', self.format_msg, host=server_host, port=server_port
         )
         self.subscriber = proccom.Subscriber(
-            {'feedback': self.handle_feedback, 'reference': self.handle_reference},
+            {'feedback': self.handle_feedback, 'regulator_settings': self.handle_settings},
             'regulator_sub', host=server_host, port=server_port
         )
         self.pid = PID(
@@ -18,15 +19,71 @@ class Regulator:
             ilim=regulator_param['ilim'], olim=regulator_param['olim']
         )
         self.base_time = regulator_param['base_time']
+        self.min_dd = regulator_param['min_dd']
+        self.max_dd = regulator_param['max_dd']
+        self.cutoff = regulator_param['cutoff_threshold']
         self.physical_param = physical_param
+        self.reference = 0
 
-    def format_msg(self, data):
-        pass
+        self.first_output = True
+        self.prev_dd0 = 0
+        self.prev_dd1 = 0
+        self.prev_enable0 = False
+        self.prev_enable1 = False
+        self.prev_reverse0 = False
+        self.prev_reverse1 = False
+
+    def format_msg(self, drive_delay, reverse, enable):
+        if self.first_output:
+            output = {
+                "drive_delay1": drive_delay[0],
+                "drive_delay2": drive_delay[1],
+                "drive_enable1": enable[0],
+                "drive_enable2": enable[1],
+                "dir_state1": reverse[0],
+                "dir_state2": reverse[1]
+            }
+            self.first_output = False
+        else:
+            output = {}
+            if self.prev_dd0 != drive_delay[0]:
+                output['drive_delay0'] = drive_delay[0]
+            if self.prev_dd1 != drive_delay[1]:
+                output['drive_delay1'] = drive_delay[1]
+            if self.prev_enable0 != enable[0]:
+                output['drive_enable0'] = enable[0]
+            if self.prev_enable1 != enable[1]:
+                output['drive_enable1'] = enable[1]
+            if self.prev_reverse0 != reverse[0]:
+                output['dir_state0'] = reverse[0]
+            if self.prev_reverse1 != reverse[1]:
+                output['dir_state1'] = reverse[1]
+        self.prev_dd0 = drive_delay[0]
+        self.prev_dd1 = drive_delay[1]
+        self.prev_enable0 = enable[0]
+        self.prev_enable1 = enable[1]
+        self.prev_reverse0 = reverse[0]
+        self.prev_reverse1 = reverse[1]
+        return output
 
     def handle_feedback(self, msg):
-        pass
+        data = msg['data']
+        output = data['output']
+        # roll = output['orientation'][0]  # Currently redundant
+        pitch = output['orientation'][1]
+        # yaw = output['orientation'][2]  # Currently redundant
+        reference = self.reference  # Copy internal variable for thread safety
+        pid_out = self.pid.calculate(pitch, reference)  # rev/s
+        reverse = pid_out < 0
+        w = abs(pid_out * 2 * math.pi)  # Convert pid_out to rad/s
+        enable = w > self.cutoff
+        if enable:
+            dd = math.pi / 2 * w * self.base_time * 100
+        else:
+            dd = self.max_dd
+        self.publisher.publish([dd, dd], [reverse, reverse], [enable, enable])
 
-    def handle_reference(self, msg):
+    def handle_settings(self, msg):
         pass
 
 

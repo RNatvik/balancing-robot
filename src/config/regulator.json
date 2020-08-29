@@ -10,6 +10,9 @@
     "d": 0,
     "ilim": [-1, 1],
     "olim": [-1, 1],
-    "base_time": 0.0005
+    "base_time": 0.0005,
+    "min_dd": 10,
+    "max_dd": 1000,
+    "cutoff_threshold": 0.5
   }
 }
