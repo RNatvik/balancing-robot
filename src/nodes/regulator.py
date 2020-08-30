@@ -51,6 +51,8 @@ class Regulator:
         self.publisher.stop()
 
     def format_msg(self, drive_delay, reverse, enable):
+        drive_delay[0] = round(drive_delay[0])
+        drive_delay[1] = round(drive_delay[1])
         if self.first_output:
             output = {
                 "drive_delay1": drive_delay[0],
@@ -64,17 +66,17 @@ class Regulator:
         else:
             output = {}
             if self.prev_dd0 != drive_delay[0]:
-                output['drive_delay0'] = drive_delay[0]
+                output['drive_delay1'] = drive_delay[0]
             if self.prev_dd1 != drive_delay[1]:
-                output['drive_delay1'] = drive_delay[1]
+                output['drive_delay2'] = drive_delay[1]
             if self.prev_enable0 != enable[0]:
-                output['drive_enable0'] = enable[0]
+                output['drive_enable1'] = enable[0]
             if self.prev_enable1 != enable[1]:
-                output['drive_enable1'] = enable[1]
+                output['drive_enable2'] = enable[1]
             if self.prev_reverse0 != reverse[0]:
-                output['dir_state0'] = reverse[0]
+                output['dir_state1'] = reverse[0]
             if self.prev_reverse1 != reverse[1]:
-                output['dir_state1'] = reverse[1]
+                output['dir_state2'] = reverse[1]
         self.prev_dd0 = drive_delay[0]
         self.prev_dd1 = drive_delay[1]
         self.prev_enable0 = enable[0]
@@ -96,10 +98,11 @@ class Regulator:
             w = abs(pid_out * 2 * math.pi)  # Convert pid_out to rad/s
             enable = w > self.cutoff
             if enable:
-                dd = math.pi / 2 * w * self.base_time * 100
+                dd = math.pi / (2 * w * self.base_time * 100)
             else:
                 dd = self.max_dd
             self.publisher.publish([dd, dd], [reverse, reverse], [enable, enable])
+            print(f'pid_out: {round(pid_out, 5)}, w: {round(w, 5)}, dd: {dd}')
         else:
             pass  # TODO: handle or ignore?
 
@@ -118,6 +121,9 @@ def main(server_config_path, regulator_config_path):
     regulator_param = regulator_config['params']
 
     regulator = Regulator(server_host, server_port, physical_param, regulator_param)
+    regulator.start()
+    time.sleep(60)
+    regulator.stop()
 
 
 if __name__ == '__main__':
