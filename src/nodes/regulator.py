@@ -1,3 +1,5 @@
+import time
+
 import proccom
 import json
 import math
@@ -26,12 +28,27 @@ class Regulator:
         self.reference = 0
 
         self.first_output = True
-        self.prev_dd0 = 0
-        self.prev_dd1 = 0
+        self.prev_dd0 = self.max_dd
+        self.prev_dd1 = self.max_dd
         self.prev_enable0 = False
         self.prev_enable1 = False
         self.prev_reverse0 = False
         self.prev_reverse1 = False
+
+    def start(self):
+        self.subscriber.connect()
+        self.publisher.connect()
+        time.sleep(1)
+        self.publisher.publish(
+            [self.prev_dd0, self.prev_dd1],
+            [self.prev_reverse0, self.prev_reverse1],
+            [self.prev_enable0, self.prev_enable1]
+        )
+        self.pid.initialize()
+
+    def stop(self):
+        self.subscriber.stop()
+        self.publisher.stop()
 
     def format_msg(self, drive_delay, reverse, enable):
         if self.first_output:
@@ -74,14 +91,17 @@ class Regulator:
         # yaw = output['orientation'][2]  # Currently redundant
         reference = self.reference  # Copy internal variable for thread safety
         pid_out = self.pid.calculate(pitch, reference)  # rev/s
-        reverse = pid_out < 0
-        w = abs(pid_out * 2 * math.pi)  # Convert pid_out to rad/s
-        enable = w > self.cutoff
-        if enable:
-            dd = math.pi / 2 * w * self.base_time * 100
+        if pid_out is not None:
+            reverse = pid_out < 0
+            w = abs(pid_out * 2 * math.pi)  # Convert pid_out to rad/s
+            enable = w > self.cutoff
+            if enable:
+                dd = math.pi / 2 * w * self.base_time * 100
+            else:
+                dd = self.max_dd
+            self.publisher.publish([dd, dd], [reverse, reverse], [enable, enable])
         else:
-            dd = self.max_dd
-        self.publisher.publish([dd, dd], [reverse, reverse], [enable, enable])
+            pass  # TODO: handle or ignore?
 
     def handle_settings(self, msg):
         pass
