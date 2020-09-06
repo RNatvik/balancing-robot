@@ -1,5 +1,5 @@
 {
-  "com_port": "COM3",
+  "com_port": "COM5",
   "baudrate": 250000,
   "transmit_rate": 100,
   "registers": [

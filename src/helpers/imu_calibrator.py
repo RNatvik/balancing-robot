@@ -34,7 +34,7 @@ class Calibrator:
 
     def _calibrate_values(self):
         gyro_target = [0, 0, 0]
-        acc_target = [1, 0, 0]
+        acc_target = [0, 0, 1]
         # Calculate averages. Add offset from config file to simulate raw values
         mean_ax = sum(self.data['ax'] + self.acc_config['offset']) / len(self.data['ax'])
         mean_ay = sum(self.data['ay'] + self.acc_config['offset']) / len(self.data['ay'])
@@ -76,8 +76,8 @@ class Calibrator:
 
     def _handle_feedback(self, msg):
         data = msg['data']
-        raw_acc = data['raw']['acc']['values']
-        raw_gyro = data['raw']['gyro']['values']
+        raw_acc = data['output']['acc']
+        raw_gyro = data['output']['gyro']
         self.data['ax'].append(raw_acc[0])
         self.data['ay'].append(raw_acc[1])
         self.data['az'].append(raw_acc[2])
