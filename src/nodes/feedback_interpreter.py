@@ -1,3 +1,4 @@
+import os
 import time
 import proccom
 import dsp
@@ -69,8 +70,8 @@ class FeedbackInterpreter:
     def _extract_imu(self, data: dict):
         acc_raw = [data['acc_x'], data['acc_y'], data['acc_z']]
         gyro_raw = [data['gyro_x'], data['gyro_y'], data['gyro_z']]
-        acc = [a/self.acc_config['scale'] - offset for a, offset in zip(acc_raw, self.acc_config['offset'])]
-        gyro = [g/self.gyro_config['scale'] - offset for g, offset in zip(gyro_raw, self.gyro_config['offset'])]
+        acc = [a / self.acc_config['scale'] - offset for a, offset in zip(acc_raw, self.acc_config['offset'])]
+        gyro = [g / self.gyro_config['scale'] - offset for g, offset in zip(gyro_raw, self.gyro_config['offset'])]
         return acc, gyro
 
     def _calculate_orientation(self, acc, gyro):
@@ -79,10 +80,10 @@ class FeedbackInterpreter:
         dt = t - self.t0
         self.t0 = t
         acc_roll = math.atan2(acc[1], acc[2]) * 180 / math.pi
-        acc_pitch = math.atan2(-acc[0], math.sqrt(acc[1]**2 + acc[2]**2)) * 180 / math.pi
-        self.roll = self.comp_alpha * (self.roll + gyro[0]*dt) + (1 - self.comp_alpha) * acc_roll
-        self.pitch = self.comp_alpha * (self.pitch + gyro[1]*dt) + (1 - self.comp_alpha) * acc_pitch
-        self.yaw += gyro[2]*dt
+        acc_pitch = math.atan2(-acc[0], math.sqrt(acc[1] ** 2 + acc[2] ** 2)) * 180 / math.pi
+        self.roll = self.comp_alpha * (self.roll + gyro[0] * dt) + (1 - self.comp_alpha) * acc_roll
+        self.pitch = self.comp_alpha * (self.pitch + gyro[1] * dt) + (1 - self.comp_alpha) * acc_pitch
+        self.yaw += gyro[2] * dt
 
         return self.roll, self.pitch, self.yaw
 
@@ -92,9 +93,9 @@ class FeedbackInterpreter:
         self.test_t0 = t
         acc_roll = math.atan2(acc[1], acc[2])
         acc_pitch = math.atan2(-acc[0], math.sqrt(acc[1] ** 2 + acc[2] ** 2))
-        self.test_roll += gyro[0]*dt
-        self.test_pitch += gyro[1]*dt
-        self.test_yaw += gyro[2]*dt
+        self.test_roll += gyro[0] * dt
+        self.test_pitch += gyro[1] * dt
+        self.test_yaw += gyro[2] * dt
 
         return acc_roll, acc_pitch, self.test_roll, self.test_pitch, self.test_yaw
 
@@ -131,4 +132,6 @@ def main(server_config_path, imu_config_path):
 
 
 if __name__ == '__main__':
+    path = os.path.dirname(os.path.abspath(__file__))
+    os.chdir(path)
     main("../config/server.json", "../config/imu.json")

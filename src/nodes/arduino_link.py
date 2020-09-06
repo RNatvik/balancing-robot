@@ -1,3 +1,5 @@
+import os
+
 import serial_package as sp
 import proccom
 import time
@@ -149,4 +151,6 @@ def main(server_config_path, arduino_config_path):
 
 
 if __name__ == '__main__':
+    path = os.path.dirname(os.path.abspath(__file__))
+    os.chdir(path)
     main("../config/server.json", "../config/arduino.json")
