@@ -34,7 +34,7 @@ class Calibrator:
 
     def _calibrate_values(self):
         gyro_target = [0, 0, 0]
-        acc_target = [0, 0, 1]
+        acc_target = [0, 0, -1]
         # Calculate averages. Add offset from config file to simulate raw values
         mean_ax = sum(self.data['ax'] + self.acc_config['offset']) / len(self.data['ax'])
         mean_ay = sum(self.data['ay'] + self.acc_config['offset']) / len(self.data['ay'])
@@ -99,7 +99,7 @@ def main(server_config_path, imu_config_path):
     gyro_config = imu_config['gyro']
     calibrator = Calibrator('feedback', acc_config, gyro_config, host=host, port=port)
     calibrator.start()
-    time.sleep(15)
+    time.sleep(30)
     calibrator.stop(imu_config_path)
 
 
