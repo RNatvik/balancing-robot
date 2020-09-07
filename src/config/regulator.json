@@ -5,11 +5,11 @@
     "centre_of_mass": 0.2
   },
   "params": {
-    "p": 0.4,
+    "p": 2,
     "i": 0,
     "d": 0,
     "ilim": [-5, 5],
-    "olim": [-5, 5],
+    "olim": [-10, 10],
     "base_time": 0.00002,
     "min_dd": 10,
     "max_dd": 1000,

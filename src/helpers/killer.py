@@ -21,4 +21,4 @@ if __name__ == '__main__':
     ]
     for target in hosts:
         main(target)
-        time.sleep(5)
+        time.sleep(2)
