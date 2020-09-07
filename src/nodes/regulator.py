@@ -61,7 +61,7 @@ class Regulator:
                 "drive_enable1": enable[0],
                 "drive_enable2": enable[1],
                 "dir_state1": reverse[0],
-                "dir_state2": reverse[1]
+                "dir_state2": not reverse[1]
             }
             self.first_output = False
         else:
@@ -77,7 +77,7 @@ class Regulator:
             if self.prev_reverse0 != reverse[0]:
                 output['dir_state1'] = reverse[0]
             if self.prev_reverse1 != reverse[1]:
-                output['dir_state2'] = reverse[1]
+                output['dir_state2'] = not reverse[1]
         self.prev_dd0 = drive_delay[0]
         self.prev_dd1 = drive_delay[1]
         self.prev_enable0 = enable[0]

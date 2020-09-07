@@ -1,7 +1,7 @@
 {
   "com_port": "COM5",
   "baudrate": 250000,
-  "transmit_rate": 100,
+  "transmit_rate": 500,
   "registers": [
     {
       "reg_num": 0,
