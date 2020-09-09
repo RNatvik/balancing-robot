@@ -36,6 +36,6 @@ def main(server_config_path, delay=2):
 
 
 if __name__ == '__main__':
-    path = os.path.dirname(os.path.abspath(__file__))
-    os.chdir(path)
+    # path = os.path.dirname(os.path.abspath(__file__))
+    # os.chdir(path)
     main('../config/server.json')
