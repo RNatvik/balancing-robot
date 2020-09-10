@@ -1,6 +1,6 @@
 import json
 import time
-import os
+import decorators as deco
 import proccom
 
 
@@ -86,9 +86,8 @@ class Calibrator:
         self.data['gz'].append(raw_gyro[2])
 
 
+@deco.dir_active(__file__)
 def main(server_config_path, imu_config_path):
-    path = os.path.dirname(os.path.abspath(__file__))
-    os.chdir(path)
     with open(server_config_path, 'r') as server_file:
         server_config = json.load(server_file)
     with open(imu_config_path, 'r') as imu_file:

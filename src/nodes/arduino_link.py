@@ -1,5 +1,4 @@
-import os
-
+import decorators as deco
 import serial_package as sp
 import proccom
 import time
@@ -119,6 +118,7 @@ class ArduinoLink:
                 self.stop()
 
 
+@deco.dir_active(__file__)
 def main(server_config_path, arduino_config_path):
     """
     Start the arduino_link node
@@ -151,6 +151,4 @@ def main(server_config_path, arduino_config_path):
 
 
 if __name__ == '__main__':
-    path = os.path.dirname(os.path.abspath(__file__))
-    os.chdir(path)
     main("../config/server.json", "../config/arduino.json")

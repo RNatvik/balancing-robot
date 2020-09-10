@@ -1,6 +1,5 @@
-import os
+import decorators as deco
 import time
-
 import proccom
 import json
 import math
@@ -111,6 +110,7 @@ class Regulator:
         pass
 
 
+@deco.dir_active(__file__)
 def main(server_config_path, regulator_config_path):
     with open(server_config_path, 'r') as server_file:
         server_config = json.load(server_file)
@@ -128,6 +128,4 @@ def main(server_config_path, regulator_config_path):
 
 
 if __name__ == '__main__':
-    path = os.path.dirname(os.path.abspath(__file__))
-    os.chdir(path)
     main('../config/server.json', '../config/regulator.json')
