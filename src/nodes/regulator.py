@@ -24,6 +24,8 @@ class Regulator:
         self.min_dd = regulator_param['min_dd']
         self.max_dd = regulator_param['max_dd']
         self.cutoff = regulator_param['cutoff_threshold']
+        self.scale_a = regulator_param['equation']['a']
+        self.scale_b = regulator_param['equation']['b']
         self.physical_param = physical_param
         self.reference = 0
 
@@ -94,15 +96,15 @@ class Regulator:
         reference = self.reference  # Copy internal variable for thread safety
         pid_out = self.pid.calculate(pitch, reference)  # rev/s
         if pid_out is not None:
+            # TODO: Make correct
             reverse = pid_out < 0
-            w = abs(pid_out * 2 * math.pi)  # Convert pid_out to rad/s
-            enable = w > self.cutoff
+            enable = pid_out > self.cutoff
             if enable:
-                dd = math.pi / (2 * w * self.base_time * 100)
+                dd = self.scale_a*pid_out + self.scale_b
             else:
                 dd = self.max_dd
             self.publisher.publish([dd, dd], [reverse, reverse], [enable, enable])
-            print(f'pid_out: {round(pid_out, 5)}, w: {round(w, 5)}, dd: {dd}')
+            print(f'pid_out: {round(pid_out, 5)}, dd: {dd}')
         else:
             pass  # TODO: handle or ignore?
 

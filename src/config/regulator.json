@@ -1,7 +1,7 @@
 {
   "physical": {
-    "wheel_diameter": 0.08,
-    "motor_resolution": 200,
+    "wheel_diameter": 0.09,
+    "motor_resolution": 800,
     "centre_of_mass": 0.2
   },
   "params": {
@@ -9,10 +9,14 @@
     "i": 0,
     "d": 0,
     "ilim": [-5, 5],
-    "olim": [-10, 10],
+    "olim": [-11, 11],
     "base_time": 0.00002,
-    "min_dd": 10,
-    "max_dd": 1000,
-    "cutoff_threshold": 0.5
+    "min_dd": 25,
+    "max_dd": 300,
+    "cutoff_threshold": 0.2
+  },
+  "equation": {
+    "a": -45,
+    "b": 300
   }
 }
